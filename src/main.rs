@@ -3,6 +3,8 @@ extern crate rand;
 
 use std::error::Error;
 use std::f32;
+use std::sync::{Arc, Mutex};
+use std::thread;
 
 mod camera;
 mod hit_record;
@@ -60,10 +62,10 @@ fn build_world() -> impl Surface {
                         next_random() * next_random(),
                     )));
                     world.push(Box::new(MovingSphere::new(
-                        center + Vector3::new(0.0, next_random() * 0.25, 0.0),
-                        center + Vector3::new(0.0, next_random() * 0.25, 0.0),
+                        center + Vector3::new(0.0, next_random() * 0.1, 0.0),
+                        center + Vector3::new(0.0, next_random() * 0.1, 0.0),
                         0.0,
-                        1.0,
+                        10.0,
                         0.2,
                         material,
                     )));
@@ -104,6 +106,27 @@ fn build_world() -> impl Surface {
     world
 }
 
+fn build_camera(nx: u32, ny: u32) -> Camera {
+    let look_from = Vector3::new(13.0, 2.0, 3.0);
+    let look_at = Vector3::new(0.0, 0.0, 0.0);
+    let vup = Vector3::new(0.0, 1.0, 0.0);
+    let vfov = 20.0;
+    let aspect = (nx as f32) / (ny as f32);
+    let aperture = 0.1;
+    let focus_distance = look_from.distance_to(look_at);
+    Camera::new(
+        look_from,
+        look_at,
+        vup,
+        vfov,
+        aspect,
+        aperture,
+        focus_distance,
+        0.0,
+        1.0,
+    )
+}
+
 fn color(world: &Surface, ray: &Ray) -> Vector3 {
     fn color_rec(world: &Surface, ray: &Ray, depth: i32) -> Vector3 {
         if depth >= MAX_DEPTH {
@@ -122,55 +145,66 @@ fn color(world: &Surface, ray: &Ray) -> Vector3 {
     color_rec(world, ray, 0)
 }
 
-fn render(world: &Surface, camera: &Camera, nx: u32, ny: u32, ns: u32) -> Image {
-    let mut image = Image::new(nx, ny);
-    for y in 0..ny {
-        for x in 0..nx {
-            let mut c = Vector3::new(0.0, 0.0, 0.0);
-            for _ in 0..ns {
-                let u = (x as f32 + next_random()) / (nx as f32);
-                let v = (y as f32 + next_random()) / (ny as f32);
-                let ray = camera.cast_ray(u, v);
-                c = c + color(world, &ray)
+fn render(
+    world: impl Surface,
+    camera: Camera,
+    nx: u32,
+    ny: u32,
+    nsamples: u32,
+    nthreads: u32,
+) -> Image {
+    let world = Arc::new(world);
+    let camera = Arc::new(camera);
+    let image = Arc::new(Mutex::new(Image::new(nx, ny)));
+
+    let mut threads = Vec::new();
+    for threadid in 0..nthreads {
+        let world = Arc::clone(&world);
+        let camera = Arc::clone(&camera);
+        let image = Arc::clone(&image);
+        let handle = thread::spawn(move || {
+            for y in 0..ny {
+                if y % nthreads != threadid {
+                    continue;
+                }
+                for x in 0..nx {
+                    let mut c = Vector3::new(0.0, 0.0, 0.0);
+                    for _ in 0..nsamples {
+                        let u = (x as f32 + next_random()) / (nx as f32);
+                        let v = (y as f32 + next_random()) / (ny as f32);
+                        let ray = camera.cast_ray(u, v);
+                        c = c + color(world.as_ref(), &ray)
+                    }
+                    // Average the samples to determine pixel color.
+                    c = c / nsamples as f32;
+                    // Apply approximate gamma correction to the color.
+                    c = c.sqrt();
+                    // Update image with the newly calculated pixel, flipping the y
+                    // axis to match the expected coordinate system.
+                    let mut image = image.lock().unwrap();
+                    image.set_pixel(x, ny - y - 1, c);
+                }
             }
-            // Average the samples to determine pixel color.
-            c = c / ns as f32;
-            // Apply approximate gamma correction to the color.
-            c = c.sqrt();
-            // Update image with the newly calculated pixel, flipping the y
-            // axis to match the expected coordinate system.
-            image.set_pixel(x, ny - y - 1, c);
-        }
+        });
+        threads.push(handle);
     }
-    image
+
+    for thread in threads {
+        thread.join().unwrap();
+    }
+
+    Arc::try_unwrap(image).unwrap().into_inner().unwrap()
 }
 
 fn main() -> Result<(), Box<Error>> {
-    let nx = 640;
-    let ny = 480;
-    let ns = 1024;
-
-    let look_from = Vector3::new(13.0, 2.0, 3.0);
-    let look_at = Vector3::new(0.0, 0.0, 0.0);
-    let vup = Vector3::new(0.0, 1.0, 0.0);
-    let vfov = 20.0;
-    let aspect = (nx as f32) / (ny as f32);
-    let aperture = 0.1;
-    let focus_distance = look_from.distance_to(look_at);
-    let camera = Camera::new(
-        look_from,
-        look_at,
-        vup,
-        vfov,
-        aspect,
-        aperture,
-        focus_distance,
-        0.0,
-        1.0,
-    );
+    let nx = 1920;
+    let ny = 1080;
+    let nsamples = 2048;
+    let nthreads = 24;
 
     let world = build_world();
-    let image = render(&world, &camera, nx, ny, ns);
+    let camera = build_camera(nx, ny);
+    let image = render(world, camera, nx, ny, nsamples, nthreads);
     image.save("raytracer.png")?;
 
     Ok(())

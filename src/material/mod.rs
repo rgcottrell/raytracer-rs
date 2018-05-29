@@ -12,6 +12,6 @@ pub use self::dielectric::Dielectric;
 pub use self::lambertian::Lambertian;
 pub use self::metal::Metal;
 
-pub trait Material: Debug + 'static {
+pub trait Material: Debug + Sync + Send + 'static {
     fn scatter(&self, ray: &Ray, hit: &HitRecord) -> Option<ScatterRecord>;
 }

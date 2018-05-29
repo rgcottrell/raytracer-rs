@@ -5,6 +5,7 @@ use std::path::Path;
 
 use vector::Vector3;
 
+#[derive(Debug)]
 pub struct Image {
     width: u32,
     height: u32,
