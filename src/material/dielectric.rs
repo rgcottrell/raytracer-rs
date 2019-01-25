@@ -1,9 +1,9 @@
-use hit_record::HitRecord;
-use material::Material;
-use math::{next_random, reflect, refract, schlick};
-use ray::Ray;
-use scatter_record::ScatterRecord;
-use vector::Vector3;
+use crate::hit_record::HitRecord;
+use crate::material::Material;
+use crate::math::{next_random, reflect, refract, schlick};
+use crate::ray::Ray;
+use crate::scatter_record::ScatterRecord;
+use crate::vector::Vector3;
 
 #[derive(Debug)]
 pub struct Dielectric {

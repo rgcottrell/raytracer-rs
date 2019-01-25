@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
-use hit_record::HitRecord;
-use ray::Ray;
+use crate::hit_record::HitRecord;
+use crate::ray::Ray;
 
 mod moving_sphere;
 mod sphere;

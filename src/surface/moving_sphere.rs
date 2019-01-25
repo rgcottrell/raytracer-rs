@@ -1,8 +1,8 @@
-use hit_record::HitRecord;
-use material::Material;
-use ray::Ray;
-use surface::Surface;
-use vector::Vector3;
+use crate::hit_record::HitRecord;
+use crate::material::Material;
+use crate::ray::Ray;
+use crate::surface::Surface;
+use crate::vector::Vector3;
 
 #[derive(Debug)]
 pub struct MovingSphere {

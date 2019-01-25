@@ -17,16 +17,16 @@ mod surface;
 mod texture;
 mod vector;
 
-pub use camera::Camera;
-pub use hit_record::HitRecord;
-pub use image::Image;
-pub use material::{Dielectric, Lambertian, Material, Metal};
-pub use math::{next_random, random_in_unit_disc, random_in_unit_sphere, reflect, refract, schlick};
-pub use ray::Ray;
-pub use scatter_record::ScatterRecord;
-pub use surface::{MovingSphere, Sphere, Surface};
-pub use texture::{CheckerTexture, ConstantTexture, Texture};
-pub use vector::Vector3;
+pub use crate::camera::Camera;
+pub use crate::hit_record::HitRecord;
+pub use crate::image::Image;
+pub use crate::material::{Dielectric, Lambertian, Material, Metal};
+pub use crate::math::{next_random, random_in_unit_disc, random_in_unit_sphere, reflect, refract, schlick};
+pub use crate::ray::Ray;
+pub use crate::scatter_record::ScatterRecord;
+pub use crate::surface::{MovingSphere, Sphere, Surface};
+pub use crate::texture::{CheckerTexture, ConstantTexture, Texture};
+pub use crate::vector::Vector3;
 
 const MAX_DEPTH: i32 = 50;
 
@@ -197,10 +197,10 @@ fn render(
 }
 
 fn main() -> Result<(), Box<Error>> {
-    let nx = 1920;
-    let ny = 1080;
-    let nsamples = 2048;
-    let nthreads = 24;
+    let nx = 640;
+    let ny = 480;
+    let nsamples = 128;
+    let nthreads = 8;
 
     let world = build_world();
     let camera = build_camera(nx, ny);

@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use vector::Vector3;
+use crate::vector::Vector3;
 
 mod checker;
 mod constant;

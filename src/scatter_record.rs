@@ -1,5 +1,5 @@
-use ray::Ray;
-use vector::Vector3;
+use crate::ray::Ray;
+use crate::vector::Vector3;
 
 #[derive(Debug)]
 pub struct ScatterRecord {

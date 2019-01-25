@@ -1,7 +1,7 @@
 use rand::random;
 use std::f32::consts::{FRAC_PI_2, PI};
 
-use vector::Vector3;
+use crate::vector::Vector3;
 
 /// Returns a random number between 0 and 1.
 #[inline]

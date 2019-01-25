@@ -1,8 +1,8 @@
 use std::fmt::Debug;
 
-use hit_record::HitRecord;
-use ray::Ray;
-use scatter_record::ScatterRecord;
+use crate::hit_record::HitRecord;
+use crate::ray::Ray;
+use crate::scatter_record::ScatterRecord;
 
 mod dielectric;
 mod lambertian;

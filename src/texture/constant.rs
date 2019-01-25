@@ -1,5 +1,5 @@
-use texture::Texture;
-use vector::Vector3;
+use crate::texture::Texture;
+use crate::vector::Vector3;
 
 #[derive(Debug)]
 pub struct ConstantTexture {

@@ -1,5 +1,5 @@
-use material::Material;
-use vector::Vector3;
+use crate::material::Material;
+use crate::vector::Vector3;
 
 #[derive(Debug)]
 pub struct HitRecord<'a> {

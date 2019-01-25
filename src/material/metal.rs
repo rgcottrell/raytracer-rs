@@ -1,9 +1,9 @@
-use hit_record::HitRecord;
-use material::Material;
-use math::{random_in_unit_sphere, reflect};
-use ray::Ray;
-use scatter_record::ScatterRecord;
-use texture::Texture;
+use crate::hit_record::HitRecord;
+use crate::material::Material;
+use crate::math::{random_in_unit_sphere, reflect};
+use crate::ray::Ray;
+use crate::scatter_record::ScatterRecord;
+use crate::texture::Texture;
 
 #[derive(Debug)]
 pub struct Metal {

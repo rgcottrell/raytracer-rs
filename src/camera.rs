@@ -1,8 +1,8 @@
 use std::f32::consts::PI;
 
-use math::{next_random, random_in_unit_disc};
-use ray::Ray;
-use vector::Vector3;
+use crate::math::{next_random, random_in_unit_disc};
+use crate::ray::Ray;
+use crate::vector::Vector3;
 
 #[derive(Debug)]
 pub struct Camera {

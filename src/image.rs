@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::{self, BufWriter};
 use std::path::Path;
 
-use vector::Vector3;
+use crate::vector::Vector3;
 
 #[derive(Debug)]
 pub struct Image {
